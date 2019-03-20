@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "strict": true,
+    "module": "es6",
+    "target": "es6",
+    "jsx": "react",
+    "jsxFactory": "h",
+    "moduleResolution": "node"
+  },
+  "include": [
+    "src/*.ts",
+    "src/*.tsx"
+  ]
+}
