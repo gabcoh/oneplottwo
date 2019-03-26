@@ -1,0 +1,6 @@
+NEXT STEPS
+organize equations
+classify equations from ast and instantiate correct equation class (make
+general equation interfaces (rectangular/spherical/cylindical))
+idea:
+add A Ray tracer to see points

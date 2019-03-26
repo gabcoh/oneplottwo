@@ -1,7 +1,12 @@
+/*
+ * TODO only load preact/debug when in debug mode
+ * TODO improve this header
+ *
+ * This component handles displaying a list of every curve.
+ */
 import { h, render, Component } from 'preact';
 import { OrderedSet } from 'immutable';
 
-// TODO ONLY LOAD IN DEBUG
 import 'preact/debug';
 
 import { Grapher } from '../Grapher';
@@ -48,12 +53,17 @@ export class GraphController extends Component<GraphControllerProps, GraphContro
   }
   render(props: GraphControllerProps, state: GraphControllerState) {
     return (
-      <div>
+      <span>
         <ul>
           { [...state.curveKeys].map(this.renderCurve) }
         </ul>
-        <button onClick={this.addCurve}> <h1>add curve </h1></button>
-      </div>
+        <button
+          onClick={this.addCurve}
+          className="center"
+        >
+          add curve
+        </button>
+      </span>
     );
   }
 }

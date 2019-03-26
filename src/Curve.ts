@@ -1,7 +1,19 @@
+/*
+ * TODO improve this documentation header
+ *
+ * This class represents a curve to be graphed (the whole reason we're here). Right now
+ * it is just called curve, but it soon should become a super class of each curve type.
+ * At the moment it is really just an explicit curve.
+ *
+ * The curve class is responsible for the Threejs Object3d of the curve. This class
+ * creates all of the webgl buffers, initializes and generates geometry, and chooses shaders.
+ *
+ */
 import * as THREE from 'three';
 
 import { RectangularBounds } from './Bounds';
-import { Equation } from './Equation';
+import { Equation } from './equations/Equation';
+import { parseEquation } from './EquationParser';
 // This is really just for functions of z=f(x,y) but I'll deal with that later
 // Also, maybe call this Curve and the actual function Function
 export class Curve {
@@ -25,7 +37,8 @@ export class Curve {
   mesh: THREE.Object3D;
 
   constructor() {
-    this.equation = new Equation('x*y');
+    // Parser should never fail on default
+    this.equation = parseEquation('x*y') as Equation;
     // Set to a reasonable default
     this.points = 10;
 
@@ -38,7 +51,7 @@ export class Curve {
     this.material = new THREE.MeshPhongMaterial({
       side: THREE.DoubleSide,
       specular: 0xffffff,
-      shininess: 1,
+      shininess: 30,
       wireframe: false,
       vertexColors: THREE.VertexColors,
     });
@@ -78,8 +91,8 @@ export class Curve {
         normals[base + 1] = vx.y;
         normals[base + 2] = vx.z;
 
-        colors[base + 0] = (x - this.bounds.minX) * 255 / xRange;
-        colors[base + 1] = (y - this.bounds.minY) * 255 / yRange;
+        colors[base + 0] = 200;
+        colors[base + 1] = 0;
         colors[base + 2] = 0;
       }
     }
@@ -111,12 +124,14 @@ export class Curve {
     this.material.dispose();
   }
   updateEquation(rawEquation: string) : (Error | null) {
-    try {
-      this.equation = new Equation(rawEquation);
-    } catch (e) {
-      return e;
+    const eqOrError = parseEquation(rawEquation);
+    // Pretty sure this is correct but its slightly advanced type fu for me at the moment
+    if (eqOrError instanceof Equation) {
+      this.equation = eqOrError;
+      this.updateBuffers();
+    } else {
+      console.log(eqOrError);
     }
-    this.updateBuffers();
     return null;
   }
 }

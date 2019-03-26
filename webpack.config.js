@@ -6,7 +6,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /(?!test)\.tsx?$/,
         use: [
           {
             loader: 'ts-loader',
@@ -27,7 +27,7 @@ module.exports = {
             }
           },
         ]
-      }
+      },
     ]
   },
   resolve: {
