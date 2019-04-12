@@ -9,7 +9,7 @@ import { h, render, Component } from 'preact';
 import linkstate from 'linkstate';
 
 import { Grapher } from '../Grapher';
-import { Curve } from '../Curve';
+import { Curve } from '../curves/Curve';
 
 export interface CurveControllerProps {
   curveKey: number;

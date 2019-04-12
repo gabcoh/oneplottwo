@@ -3,7 +3,9 @@ import * as parser from '../src/EquationParser';
 
 const lexer = parser.__PRIVATE__.lexer;
 const shuntingYard = parser.__PRIVATE__.shuntingYard;
+const countVariables = parser.__PRIVATE__.countVariables;
 const ops = parser.__PRIVATE__.operators;
+const functions = parser.__PRIVATE__.functions;
 // Make token (return object to ignore column because that would be annoying)
 function mkt(t: parser.TokenTypes, s: string): Object {
   return {
@@ -95,23 +97,23 @@ describe('shunting yard', () => {
   });
   test('correctly shunts expressions with function calls', () => {
     let expected: parser.ASTNode = {
-      operator: new parser.FunctionOperator('test', 3),
-      operands: [1, 2, 3],
+      operator: functions.get('sum') as parser.Operator,
+      operands: [1, 2],
     };
-    expect(shuntingYard(lexer('test(1, 2, 3)'))).toEqual(expected);
+    expect(shuntingYard(lexer('sum(1, 2)'))).toEqual(expected);
     expected = {
-      operator: new parser.FunctionOperator('test', 1),
+      operator: functions.get('sum') as parser.Operator,
       operands: [{
-        operator: new parser.FunctionOperator('test', 1),
-        operands: [1],
-      }],
+        operator: functions.get('sum') as parser.Operator,
+        operands: [1, 2],
+      }, 2],
     };
-    expect(shuntingYard(lexer('test(test(1))'))).toEqual(expected);
+    expect(shuntingYard(lexer('sum(sum(1, 2), 2)'))).toEqual(expected);
 
     expected = {
       operator: ops.get('+') as parser.Operator,
       operands: [1, {
-        operator: new parser.FunctionOperator('test', 2),
+        operator: functions.get('sum') as parser.Operator,
         operands: [{
           operator: ops.get('+') as parser.Operator,
           operands: [1, 2],
@@ -120,13 +122,22 @@ describe('shunting yard', () => {
           operands: [1, {
             operator: ops.get('+') as parser.Operator,
             operands: [{
-              operator: new parser.FunctionOperator('testb', 2),
+              operator: functions.get('sum') as parser.Operator,
               operands: [1, 2],
             }, 3],
           }],
         }],
       }],
     };
-    expect(shuntingYard(lexer('1 + test(1 + 2, 1 * (testb(1, 2) + 3))'))).toEqual(expected);
+    expect(shuntingYard(lexer('1 + sum(1 + 2, 1 * (sum(1, 2) + 3))'))).toEqual(expected);
+  });
+});
+describe('parseEquation', () => {
+  test('count variables works properly', () => {
+    expect(countVariables(shuntingYard(lexer('a + b')) as parser.ASTNode)).toEqual(['a', 'b']);
+
+    expect(countVariables(shuntingYard(lexer('a + b * (1 + 2)^c')) as parser.ASTNode)).toEqual(
+      ['a', 'b', 'c']
+    );
   });
 });

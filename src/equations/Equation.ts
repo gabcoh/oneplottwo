@@ -1,9 +1,13 @@
 /*
- * TODO improve this header
+ * TODO implement custom type guards here
+ *
+ * Checks kind to determine type of equation. First element is either imp or
+ * exp second is coord system
  */
-export interface RectangularEquation {
-  rawEquation: string;
+import { ExplicitRectangularEquation } from './RectangularEquations';
 
-  evaluate(x: number): number;
-  derivate(bx: number, by: number, delta: number): [number, number];
+export type Equation = ExplicitRectangularEquation;
+
+export function isExplicitRectangular(a: any): a is ExplicitRectangularEquation {
+  return a.kind[0] === 'explicit' && a.kind[1] === 'rectangular';
 }

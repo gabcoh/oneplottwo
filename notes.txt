@@ -1,6 +1,32 @@
 NEXT STEPS
+VERY NEXT STEP (After ast classifier)
+NEW REORGANIZATION IDEA:
+ONE CURVE TYPE THAT JUST HAS REDRAW AND GET OBJECT METHODS
+BUT IT ALSO HAS A CLASS LIKE CurveParameters THAT RETURNS AN OBJECT REPRESENTING THE CURVE
+PARAMETERS WITH FOLDERS AND TYPES OF PARAMETERS AND EQUATION VIEW ITERATES THROW AND MAKES
+FOLDERS AND ADDS THE RIGHT TYPE OF CONTROLLER VIEW FOR EACH TYPE. eg:
+{
+  "material": {
+    "shineiness": number,
+    "specular": color,
+  },
+  "BoundingBOx": {
+    x: number
+REORGANIZE ALL CURVE/EQUATION/BOUNDS CLASSES TO HAVE General superclasses with specific
+sub classes for each curve type
 organize equations
 classify equations from ast and instantiate correct equation class (make
 general equation interfaces (rectangular/spherical/cylindical))
+curves should also be generalized and then specifc rectangular, polar...
+implementations should be made
+
+make error classes for parsing. a class for general erros and a class for errors
+that point to a specific part of input
 idea:
 add A Ray tracer to see points
+
+implicit notes:
+https://academic.oup.com/comjnl/article/33/5/402/480353
+
+TODO 
+fix varying line lengths (especially in comment texts)

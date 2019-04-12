@@ -2,6 +2,8 @@
  * TODO Improve error messages
  * TODO throw errors in lexer if appropriate
  * TODO consider returning errors so that typescript knows there type
+ * TODO maybe let each curve/equation class implement parse equation
+ * TODO parse equation should return an equation. Not an ast
  *
  * This file implements dikstra's shunting yard algorithm to parse arithmetic expressions.
  * Raw equations are first passed to the lexer which tokenizes them and labels each token,
@@ -11,9 +13,12 @@
  *
  * So far, equations can consist of functions, parenthized expressions, and binary operators.
  * Prefix operators should work, but none are implemented and for that reasons there also
- * are no tests for them. 
+ * are no tests for them.
  * Names of functions and variables can not contain numbers!
+ *
  */
+import { EquationTypes } from './equations/EquationTypes';
+import { ExplicitRectangularEquation } from './equations/RectangularEquations';
 import { Equation } from './equations/Equation';
 
 export enum Associativity {
@@ -24,67 +29,87 @@ export enum Associativity {
 export interface Operator {
   name: string;
   precedence: number;
+  // have the option to return errro but I am not using that at the moment
+  func: (...params: number[]) => (Error | number);
   associativity?: Associativity;
   arity: number;
   prefix?: boolean;
 }
-const ROOT_OPERATOR: Operator = {
-  name: 'ROOT',
-  precedence: -1,
-  arity: 1,
-};
 const PAREN_OPERATOR: Operator = {
   name: 'PAREN',
   precedence: -1,
   arity: -1,
+  func(...params: number[]) {
+    return new Error('You should never call = as function');
+  },
 };
+const functions: Map<string, Operator> = new Map([
+  ['sum', {
+    name: 'EXP',
+    precedence: 4,
+    arity: 2,
+    func(...params: number[]) {
+      return params.reduce((a, b) => a + b);
+    },
+  }],
+]);
 const operators: Map<string, Operator> = new Map([
   ['^', {
     name: 'EXP',
     precedence: 4,
     arity: 2,
     associativity: Associativity.RIGHT,
+    func(...params: number[]) {
+      return Math.pow(params[0], params[1]);
+    },
   }],
   ['*', {
     name: 'MULT',
     precedence: 3,
     arity: 2,
     associativity: Associativity.RIGHT,
+    func(...params: number[]) {
+      return params[0] * params[1];
+    },
   }],
   ['/', {
     name: 'DIV',
     precedence: 3,
     arity: 2,
     associativity: Associativity.RIGHT,
+    func(...params: number[]) {
+      return params[0] / params[1];
+    },
   }],
   ['+', {
     name: 'ADD',
     precedence: 2,
     arity: 2,
     associativity: Associativity.RIGHT,
+    func(...params: number[]) {
+      return params[0] + params[1];
+    },
   }],
   ['-', {
     name: 'SUB',
     precedence: 2,
     arity: 2,
     associativity: Associativity.RIGHT,
+    func(...params: number[]) {
+      return params[0] - params[1];
+    },
   }],
   ['=', {
     name: 'EQ',
     precedence: 1,
     arity: 2,
     associativity: Associativity.RIGHT,
+    func(...params: number[]) {
+      return new Error('You should never call = as function');
+    },
   }],
 ]);
-export class FunctionOperator implements Operator {
-  name: string;
-  arity: number;
-  precedence: number = -1;
-  constructor(name: string, arity: number) {
-    this.name = name;
-    this.arity = arity;
-  }
-}
+
 export enum TokenTypes {
   OPERATOR,
   NAME,
@@ -152,10 +177,12 @@ function lexer(raw: string): Token[] {
   return tokens;
 }
 
-export type ASTNode = number | string | {
+export interface ASTFuncNode {
   operator: Operator;
   operands: ASTNode[];
-};
+}
+export type ASTNode = number | string | ASTFuncNode;
+
 function applyNextOperator(operatorStack: Operator[], operandStack: ASTNode[]) {
   if (operatorStack.length === 0) {
     throw new Error('inssuficient operators');
@@ -233,8 +260,12 @@ function shuntingYard(tokens: Token[]): ASTNode {
               operandStack.pop() as ASTNode);
             const funcOperands = functionOperandStack[functionOperandStack.length - 1].operands;
             const fun = operandStack.pop() as string;
+            // I can't remember if this was already checked
+            if (!functions.has(fun)) {
+              throw new Error(`function ${fun} is not defined`);
+            }
             operandStack.push({
-              operator: new FunctionOperator(fun, funcOperands.length),
+              operator: functions.get(fun) as Operator,
               operands: funcOperands,
             });
             functionOperandStack.pop();
@@ -267,18 +298,70 @@ function shuntingYard(tokens: Token[]): ASTNode {
 
   return operandStack[0];
 }
-export function parseEquation(rawEquation: string): (ASTNode | Error) {
+
+export function isAnASTFuncNode(obj: any): obj is ASTFuncNode {
+  return typeof obj === 'object' && 'operator' in obj && 'operands' in obj;
+}
+// Remember if mor etypes are added to ASTNode to do propper checking
+function countVariables(ast: ASTNode): string[] {
+  if (typeof ast === 'string') {
+    return [ast];
+  }
+  if (isAnASTFuncNode(ast)) {
+    let vars: string[] = [];
+    for (let i = 0; i < ast.operands.length; i = i + 1) {
+      vars = vars.concat(countVariables(ast.operands[i]));
+    }
+    return vars;
+  }
+  return [];
+}
+export function parseEquation(rawEquation: string): (Equation | Error) {
   try {
-    return shuntingYard(lexer(rawEquation));
+    const ast = shuntingYard(lexer(rawEquation));
+    if (!(isAnASTFuncNode(ast)) ||
+      (ast as ASTFuncNode).operator !== (operators.get('=') as Operator)) {
+      return new Error('Equation does not have two expressions set equal');
+    }
+    // If there is not a side with a single variable (out of x, y, z) on it then
+    // treat it as implicit
+    const leftVars = new Set(countVariables(ast.operands[0]));
+    const rightVars = new Set(countVariables(ast.operands[1]));
+    const allVars = new Set([...leftVars, ...rightVars]);
+
+    // Figure out where independent var is and what it is
+    if (leftVars.size === 1 && (leftVars.has('x') || leftVars.has('X'))) {
+      return new ExplicitRectangularEquation(rawEquation, 'x', ast.operands[1]);
+    }
+    if (leftVars.size === 1 && (leftVars.has('z') || leftVars.has('Z'))) {
+      return new ExplicitRectangularEquation(rawEquation, 'z', ast.operands[1]);
+    }
+    if (leftVars.size === 1 && (leftVars.has('y') || leftVars.has('Y'))) {
+      return new ExplicitRectangularEquation(rawEquation, 'y', ast.operands[1]);
+    }
+    if (rightVars.size === 1 && (rightVars.has('x') || rightVars.has('X'))) {
+      return new ExplicitRectangularEquation(rawEquation, 'x', ast.operands[0]);
+    }
+    if (rightVars.size === 1 && (rightVars.has('z') || rightVars.has('Z'))) {
+      return new ExplicitRectangularEquation(rawEquation, 'z', ast.operands[0]);
+    }
+    if (rightVars.size === 1 && (rightVars.has('y') || rightVars.has('Y'))) {
+      return new ExplicitRectangularEquation(rawEquation, 'y', ast.operands[0]);
+    }
+    return new Error(`cannot parse ${rawEquation} as Rectangular`);
   } catch (e) {
-    return e;
+    if (e instanceof Error) {
+      return e;
+    }
+    throw e;
   }
 }
-
 const __PRIVATE__ = {
   lexer,
   operators,
+  functions,
   shuntingYard,
+  countVariables,
 };
 export {
   __PRIVATE__,

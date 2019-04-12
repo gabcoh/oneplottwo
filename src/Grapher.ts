@@ -8,11 +8,11 @@
  * This class is the steward of the scene graph and controls when to redraw it, where lights
  * are, and everything else related to the 3d rendering which is not handled by each individual
  * curve. In order to be drawn, this class must be made aware of the object.
- * 
+ *
  * Because I am scared of object references, in order to refer to a specific curve, when it is
  * first added, this class provides a key for the curve which is just a random number. This key
  * is used to obtain a reference to the curve, manipulate it, and remove it from the scene graph
- * when the time comes. 
+ * when the time comes.
  *
  * This class should be the only one manipulating curves. It is acceptable for other code to
  * read from curve objects, but this class is responsible for all mutations.
@@ -20,7 +20,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three-orbitcontrols-ts';
 
-import { Curve } from './Curve';
+import { Curve } from './curves/Curve';
 
 export class Grapher {
   scene: THREE.Scene;

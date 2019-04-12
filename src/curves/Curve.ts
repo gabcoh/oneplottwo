@@ -11,11 +11,11 @@
  */
 import * as THREE from 'three';
 
-import { RectangularBounds } from './Bounds';
-import { Equation } from './equations/Equation';
-import { parseEquation } from './EquationParser';
-// This is really just for functions of z=f(x,y) but I'll deal with that later
-// Also, maybe call this Curve and the actual function Function
+import { RectangularBounds } from '../Bounds';
+import { Equation, isExplicitRectangular } from '../equations/Equation';
+import { parseEquation } from '../EquationParser';
+import { ParameterType, ColorParameter, NumberParameter } from '../ParameterTypes';
+
 export class Curve {
   // Number of points in each direction for mesh
   points: number;
@@ -31,6 +31,8 @@ export class Curve {
     minZ: -1,
     maxZ: 1,
   };
+  specular = 0xffffff;
+  shininess = 30;
 
   geometry: THREE.BufferGeometry;
   material: THREE.Material;
@@ -38,7 +40,12 @@ export class Curve {
 
   constructor() {
     // Parser should never fail on default
-    this.equation = parseEquation('x*y') as Equation;
+    const equationOrError = parseEquation('x*y = z');
+    if (equationOrError instanceof Error) {
+      console.log(equationOrError);
+      throw equationOrError;
+    }
+    this.equation = equationOrError as Equation;
     // Set to a reasonable default
     this.points = 10;
 
@@ -50,14 +57,38 @@ export class Curve {
 
     this.material = new THREE.MeshPhongMaterial({
       side: THREE.DoubleSide,
-      specular: 0xffffff,
+      specular: this.specular,
       shininess: 30,
       wireframe: false,
       vertexColors: THREE.VertexColors,
     });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
   }
-
+  getParameters(): Map<String, Map<String, ParameterType<any>>> {
+    return new Map([
+      ['appearance', new Map([
+        ['specular', new ColorParameter(
+          () => { return this.specular; },
+          (color: number) => { this.specular = color; this.reMesh.bind(this); })],
+        ['shininess', new NumberParameter(
+          () => { return this.shininess; },
+          (color: number) => { this.shininess = color; this.reMesh.bind(this); }, 0, 100)],
+      ])],
+    ]);
+  }
+  reMesh() {
+    if (this.material !== undefined && this.mesh !== undefined) {
+      this.dispose();
+    }
+    this.material = new THREE.MeshPhongMaterial({
+      side: THREE.DoubleSide,
+      specular: this.specular,
+      shininess: 30,
+      wireframe: false,
+      vertexColors: THREE.VertexColors,
+    });
+    this.mesh = new THREE.Mesh(this.geometry, this.material);
+  }
   // only need to update indicies when number of points changes
   updateBuffers() {
     const [vertices, colors, normals] = this.generatePointsColorsAndNormals();
@@ -126,9 +157,11 @@ export class Curve {
   updateEquation(rawEquation: string) : (Error | null) {
     const eqOrError = parseEquation(rawEquation);
     // Pretty sure this is correct but its slightly advanced type fu for me at the moment
-    if (eqOrError instanceof Equation) {
+    if (isExplicitRectangular(eqOrError)) {
       this.equation = eqOrError;
       this.updateBuffers();
+    } else if (!(eqOrError instanceof Error)) {
+      console.log('only explicit rectangular equations are supported right now');
     } else {
       console.log(eqOrError);
     }

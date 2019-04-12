@@ -54,9 +54,11 @@ class DragHandlerClass {
     this.down = true;
   }
   onMouseUp(e: Event) {
-    console.log('up');
-    grapher.updateSize();
-    this.down = false;
+    if (this.down === true) {
+      console.log('up');
+      grapher.updateSize();
+      this.down = false;
+    }
   }
 }
 const dh = new DragHandlerClass(grapher);
