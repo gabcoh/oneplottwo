@@ -21,6 +21,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three-orbitcontrols-ts';
 
 import { Curve } from './curves/Curve';
+import { RectangularCurve } from './curves/RectangularCurve';
 
 export class Grapher {
   scene: THREE.Scene;
@@ -67,8 +68,11 @@ export class Grapher {
     this.renderer.setSize(elem.clientWidth, elem.clientHeight);
     elem.appendChild(this.renderer.domElement);
   }
-  addCurve() : (number | null) {
-    this.curves.set(this.lastCurveKey, new Curve());
+  addRectangularCurve(): (number | null) {
+    return this.addCurve(new RectangularCurve());
+  }
+  addCurve(curve: Curve) : (number | null) {
+    this.curves.set(this.lastCurveKey, curve);
     const lastCurve = this.curves.get(this.lastCurveKey) as Curve;
     const helper = new THREE.VertexNormalsHelper(lastCurve.mesh, .1, 0x00ff00, 1);
     this.scene.add(lastCurve.mesh);

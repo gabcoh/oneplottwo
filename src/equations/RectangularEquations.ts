@@ -23,15 +23,12 @@ export class ExplicitRectangularEquation {
     const vars = new Map<string, number>([['x', x], ['y', y]]);
     return evaluateAST(this.ast, vars);
   }
-  derivate(bx: number, by: number, delta: number): [number, number] {
-    let x = bx;
-    let y = by;
+  derivate(x: number, y: number, delta: number): [number, number] {
     const vars = new Map<string, number>([['x', x], ['y', y]]);
     const fxy = evaluateAST(this.ast, vars);
     vars.set('x', x + delta);
     const dfx = evaluateAST(this.ast, vars) - fxy;
-    x = bx;
-    vars.set('x', bx);
+    vars.set('x', x);
     vars.set('y', y + delta);
     const dfy = evaluateAST(this.ast, vars) - fxy;
     return [dfx / delta, dfy / delta];

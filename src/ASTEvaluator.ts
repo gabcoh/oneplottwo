@@ -7,8 +7,8 @@ import { isAnASTFuncNode, ASTNode } from './EquationParser';
 
 export function evaluateAST(ast: ASTNode, vars: Map<string, number>): number {
   if (isAnASTFuncNode(ast)) {
-    let params: (Error | number)[] = ast.operands.map((a) => evaluateAST(a, vars));
-    for (let i = 0; i < params.length; i++) {
+    const params: (Error | number)[] = ast.operands.map(a => evaluateAST(a, vars));
+    for (let i = 0; i < params.length; i = i + 1) {
       if (typeof params[i] !== 'number') {
         throw  new Error(`${params[i]} is not a number`);
       }
@@ -18,15 +18,15 @@ export function evaluateAST(ast: ASTNode, vars: Map<string, number>): number {
       throw valOrError;
     }
     return valOrError as number;
-  } else if (typeof ast === 'string') {
+  }
+  if (typeof ast === 'string') {
     if (vars.has(ast)) {
       return vars.get(ast) as number;
-    } else {
-      throw  new Error(`variable ${ast} is undefined`);
     }
-  } else if (typeof ast === 'number') {
-    return ast;
-  } else {
-    throw  new Error('unknown type of astnode');
+    throw new Error(`variable ${ast} is undefined`);
   }
+  if (typeof ast === 'number') {
+    return ast;
+  }
+  throw new Error('unknown type of astnode');
 }

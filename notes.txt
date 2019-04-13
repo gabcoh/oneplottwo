@@ -1,4 +1,11 @@
 NEXT STEPS
+
+IT WORKS NOW MAKE CLEAN THEN IMPROVE (and stop using all caps for everything. this is why we can't have nice things)
+reread all shit and finally decide on whether to throw or return errors (leaning throw)
+also make sure that class hierarchies are as we want them to be and stuff. prune unused stuff
+
+maybe just two types of equatoins, implicit and explicit because there really is no difference to the equaiton class what the coordinate system is
+
 VERY NEXT STEP (After ast classifier)
 NEW REORGANIZATION IDEA:
 ONE CURVE TYPE THAT JUST HAS REDRAW AND GET OBJECT METHODS

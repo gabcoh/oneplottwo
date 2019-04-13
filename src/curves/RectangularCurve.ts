@@ -1,5 +1,9 @@
 /*
  * TODO improve this documentation header
+ * TODO Consider the fact that equation is of type Equation not a more accurate and more
+ *  specific type. This can be fixed maybe by changing the way Curve sets equation in constructor.
+ *  Instead of using updateEquation use an abstract setter for equation that Curve calls so
+ *  each class can make sure equation is of the correct type
  *
  * This class represents a curve to be graphed (the whole reason we're here). Right now
  * it is just called curve, but it soon should become a super class of each curve type.
@@ -11,18 +15,13 @@
  */
 import * as THREE from 'three';
 
-import { RectangularBounds } from './Bounds';
-import { Equation } from './equations/Equation';
-import { parseEquation } from './EquationParser';
-import { Curve } from './Curve.ts';
+import { RectangularBounds } from '../Bounds';
+import { Equation, isExplicitRectangular } from '../equations/Equation';
+import { parseEquation } from '../EquationParser';
+import { ParameterType, ColorParameter, NumberParameter } from '../ParameterTypes';
+import { Curve } from './Curve';
 
-export class ExplicitRectangularCurve extends Curve {
-  // Number of points in each direction for mesh
-  points: number;
-  // Just a string that gets evalled for now, should soon become a more complicated parsed object
-  equation: Equation;
-
-  // TODO IMPLEMENT BOUNDS OBJECT
+export class RectangularCurve extends Curve {
   bounds: RectangularBounds = {
     minX: -1,
     maxX: 1,
@@ -31,55 +30,30 @@ export class ExplicitRectangularCurve extends Curve {
     minZ: -1,
     maxZ: 1,
   };
-  specular = 0xffffff;
-
   geometry: THREE.BufferGeometry;
   material: THREE.Material;
   mesh: THREE.Object3D;
 
   constructor() {
-    // Parser should never fail on default
-    this.equation = parseEquation('x*y') as Equation;
-    // Set to a reasonable default
-    this.points = 10;
-
+    super('z=x*y');
     this.geometry = new THREE.BufferGeometry();
+    // calling elsewhere
     this.updateBuffers();
     // Must explicitly set to infinity for whatever reason
     // This caused hours of headache...
     this.geometry.setDrawRange(0, Infinity);
 
-    this.reMesh();
-  }
-  getParameters(): Map<String, Map<String, ParameterType>> {
-    return new Map([
-      ["appearance", new Map([
-        ["specular", new ColorParameter(this, 'specular', this.reMesh.bind(this))],
-        ["shininess", new NumberParameter(this, 'specular', this.reMesh.bind(this), 0, 100)],
-      ])],
-    ]);
-  }
-  reMesh() {
-    if (this.material !== undefined && this.mesh !== undefined) {
-      this.dispose();
-    }
     this.material = new THREE.MeshPhongMaterial({
       side: THREE.DoubleSide,
       specular: this.specular,
-      shininess: 30,
+      shininess: this.shininess,
       wireframe: false,
       vertexColors: THREE.VertexColors,
     });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
   }
-  // only need to update indicies when number of points changes
-  updateBuffers() {
-    const [vertices, colors, normals] = this.generatePointsColorsAndNormals();
-    this.geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-    this.geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-    this.geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
-    const indicies = this.generateIndicies();
-    this.geometry.setIndex(new THREE.BufferAttribute(indicies, 1));
+  getParameters(): Map<String, Map<String, ParameterType<any>>> {
+    return new Map([...super.getParameters()]);
   }
   generatePointsColorsAndNormals(): [Float32Array, Float32Array, Float32Array] {
     const vertices = new Float32Array(this.points * this.points * 3);
@@ -112,37 +86,14 @@ export class ExplicitRectangularCurve extends Curve {
     }
     return [vertices, colors, normals];
   }
-  generateIndicies(): Uint32Array {
-    const indicies = new Uint32Array((this.points - 1) * (this.points - 1) * 2 * 3);
-    for (let i = 0; i < this.points - 1; i += 1) {
-      for (let j = 0; j < this.points - 1; j += 1) {
-        const base = i * (this.points - 1) * 6 + (j * 6);
-        const a = i * this.points + j + 1;
-        const b = i * this.points + j;
-        const c = (i + 1) * this.points + j;
-        const d = (i + 1) * this.points + j + 1;
-
-        indicies[base + 0] = d;
-        indicies[base + 1] = b;
-        indicies[base + 2] = a;
-
-        indicies[base + 3] = d;
-        indicies[base + 4] = c;
-        indicies[base + 5] = b;
-      }
-    }
-    return indicies;
-  }
-  dispose() {
-    this.geometry.dispose();
-    this.material.dispose();
-  }
   updateEquation(rawEquation: string) : (Error | null) {
     const eqOrError = parseEquation(rawEquation);
-    // Pretty sure this is correct but its slightly advanced type fu for me at the moment
-    if (eqOrError instanceof Equation) {
+
+    if (isExplicitRectangular(eqOrError)) {
       this.equation = eqOrError;
       this.updateBuffers();
+    } else if (!(eqOrError instanceof Error)) {
+      console.log('only explicit rectangular equations are supported right now');
     } else {
       console.log(eqOrError);
     }

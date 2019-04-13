@@ -17,7 +17,6 @@
  * Names of functions and variables can not contain numbers!
  *
  */
-import { EquationTypes } from './equations/EquationTypes';
 import { ExplicitRectangularEquation } from './equations/RectangularEquations';
 import { Equation } from './equations/Equation';
 

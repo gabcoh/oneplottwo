@@ -28,8 +28,8 @@ export class GraphController extends Component<GraphControllerProps, GraphContro
       curveKeys: OrderedSet<number>(),
     };
   }
-  addCurve = (e: Event) => {
-    const maybeNextKey = this.props.grapher.addCurve();
+  addRectangularCurve = (e: Event) => {
+    const maybeNextKey = this.props.grapher.addRectangularCurve();
     if (maybeNextKey != null) {
       this.setState({
         curveKeys: this.state.curveKeys.add(maybeNextKey),
@@ -58,10 +58,10 @@ export class GraphController extends Component<GraphControllerProps, GraphContro
           { [...state.curveKeys].map(this.renderCurve) }
         </ul>
         <button
-          onClick={this.addCurve}
+          onClick={this.addRectangularCurve}
           className="center"
         >
-          add curve
+          add rectangular curve
         </button>
       </span>
     );
