@@ -39,7 +39,7 @@ const PAREN_OPERATOR: Operator = {
   precedence: -1,
   arity: -1,
   func(...params: number[]) {
-    return new Error('You should never call = as function');
+    return new Error('You should never call paren as function');
   },
 };
 const functions: Map<string, Operator> = new Map([
@@ -259,9 +259,13 @@ function shuntingYard(tokens: Token[]): ASTNode {
               operandStack.pop() as ASTNode);
             const funcOperands = functionOperandStack[functionOperandStack.length - 1].operands;
             const fun = operandStack.pop() as string;
+
             // I can't remember if this was already checked
             if (!functions.has(fun)) {
               throw new Error(`function ${fun} is not defined`);
+            }
+            if (funcOperands.length !== (functions.get(fun) as Operator).arity) {
+              throw new Error('insuffiecnt operands');
             }
             operandStack.push({
               operator: functions.get(fun) as Operator,

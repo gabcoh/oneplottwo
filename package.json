@@ -7,7 +7,7 @@
 		"start:dev": "webpack-dev-server --mode development",
 		"build:dev": "webpack --mode development",
 		"build:prod": "webpack --mode production",
-		"test": "jest"
+		"test": "jest --coverage --coverageReporters 'html'"
 	},
 	"author": "",
 	"license": "ISC",
@@ -30,12 +30,14 @@
 		"webpack-dev-server": "^3.2.1"
 	},
 	"dependencies": {
+		"@types/random-js": "^1.0.31",
 		"@types/three": "^0.93.27",
 		"@types/webpack": "^4.4.26",
 		"@types/webpack-env": "^1.13.9",
 		"immutable": "^4.0.0-rc.12",
 		"linkstate": "^1.1.1",
 		"preact": "^8.4.2",
+		"random-js": "^2.0.0",
 		"three": "^0.102.1",
 		"three-orbitcontrols-ts": "git+https://git@github.com/nicolaspanel/three-orbitcontrols-ts.git"
 	}

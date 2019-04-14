@@ -1,11 +1,15 @@
 
+import { real, MersenneTwister19937 } from 'random-js';
+
 import * as parser from '../src/EquationParser';
+import { ExplicitRectangularEquation } from '../src/equations/RectangularEquations';
 
 const lexer = parser.__PRIVATE__.lexer;
 const shuntingYard = parser.__PRIVATE__.shuntingYard;
 const countVariables = parser.__PRIVATE__.countVariables;
 const ops = parser.__PRIVATE__.operators;
 const functions = parser.__PRIVATE__.functions;
+
 // Make token (return object to ignore column because that would be annoying)
 function mkt(t: parser.TokenTypes, s: string): Object {
   return {
@@ -133,11 +137,37 @@ describe('shunting yard', () => {
   });
 });
 describe('parseEquation', () => {
-  test('count variables works properly', () => {
+  /*
+   test('count variables works properly', () => {
     expect(countVariables(shuntingYard(lexer('a + b')) as parser.ASTNode)).toEqual(['a', 'b']);
 
     expect(countVariables(shuntingYard(lexer('a + b * (1 + 2)^c')) as parser.ASTNode)).toEqual(
       ['a', 'b', 'c']
     );
+  });
+   */
+  test('correctly parses ExplicitRectangulars and evaluates them', () => {
+    let eq1 = (parser.parseEquation('z=x*y') as ExplicitRectangularEquation);
+    let eq2 = (parser.parseEquation('x=y*z+1') as ExplicitRectangularEquation);
+    let eq3 = (parser.parseEquation('y=(x*z+1)^5 - (7 + x)') as ExplicitRectangularEquation)
+    let eq4 = (parser.parseEquation('sum(x, y*x/2 + 1)=z') as ExplicitRectangularEquation)
+    for (let i = 0; i < 500; i = i + 1) {
+      const mt = MersenneTwister19937.seed(1);
+      const x = real(0, 10000, true)(mt);
+      const y = real(0, 10000, true)(mt);
+      expect(eq1.evaluate(x,y)).toEqual(x*y);
+      expect(eq2.evaluate(x,y)).toEqual(x*y+1);
+      expect(eq3.evaluate(x,y)).toEqual(Math.pow((x*y+1), 5) - (7+x));
+      expect(eq4.evaluate(x,y)).toEqual(x+y*x/2+1);
+    }
+  });
+  test('gives correct error for malformed ExplicitRectangulars', () => {
+    // undefined var
+    expect(() => (parser.parseEquation('z=x*y+a') as ExplicitRectangularEquation).evaluate(2,5)).toThrowErrorMatchingSnapshot();
+    // insufficient operands
+    expect(parser.parseEquation('z=x*y+') as ExplicitRectangularEquation).toEqual(new Error('insuffiecnt operands'));
+    expect(parser.parseEquation('z=sum(x*y)') as ExplicitRectangularEquation).toEqual(new Error('insuffiecnt operands'));
+    // not an equation
+    expect(parser.parseEquation('x*y') as ExplicitRectangularEquation).toEqual(new Error('Equation does not have two expressions set equal'));
   });
 });

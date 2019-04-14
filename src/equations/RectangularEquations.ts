@@ -19,8 +19,13 @@ export class ExplicitRectangularEquation {
     this.independentVariable = ind;
     this.ast = ast;
   }
-  evaluate(x: number, y: number) {
-    const vars = new Map<string, number>([['x', x], ['y', y]]);
+  evaluate(a: number, b: number) {
+    let vars = new Map<string, number>([['y', a], ['z', b]]);
+    if (this.independentVariable === 'z') {
+      vars = new Map<string, number>([['x', a], ['y', b]]);
+    } else if (this.independentVariable === 'y') {
+      vars = new Map<string, number>([['x', a], ['z', b]]);
+    }
     return evaluateAST(this.ast, vars);
   }
   derivate(x: number, y: number, delta: number): [number, number] {
