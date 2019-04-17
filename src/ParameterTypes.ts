@@ -4,7 +4,7 @@
  * both receive enough info to update the parameters on the actual objects themselves
  * (they store reference to object and property name of parameter)
  */
-export class ParameterType<T> {
+export abstract class ParameterType<T> {
   update: (up: T) => void;
   getter: () => T;
   constructor(getter: () => T, update: (up: T) => void) {
@@ -15,7 +15,6 @@ export class ParameterType<T> {
     this.update(val);
   }
   getValue(): T {
-    // This should never error because reference and prop are statically determined
     return this.getter();
   }
 }

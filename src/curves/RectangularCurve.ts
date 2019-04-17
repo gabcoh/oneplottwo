@@ -52,7 +52,7 @@ export class RectangularCurve extends Curve {
     });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
   }
-  getParameters(): Map<String, Map<String, ParameterType<any>>> {
+  getParameters(): Map<string, Map<string, ParameterType<any>>> {
     return new Map([...super.getParameters()]);
   }
   generatePointsColorsAndNormals(): [Float32Array, Float32Array, Float32Array] {
@@ -89,13 +89,14 @@ export class RectangularCurve extends Curve {
   updateEquation(rawEquation: string) : (Error | null) {
     const eqOrError = parseEquation(rawEquation);
 
+    if (eqOrError instanceof Error) {
+      return eqOrError;
+    }
     if (isExplicitRectangular(eqOrError)) {
       this.equation = eqOrError;
       this.updateBuffers();
-    } else if (!(eqOrError instanceof Error)) {
-      console.log('only explicit rectangular equations are supported right now');
     } else {
-      console.log(eqOrError);
+      console.log('only explicit rectangular equations are supported right now');
     }
     return null;
   }

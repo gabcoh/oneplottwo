@@ -51,8 +51,8 @@ export class Grapher {
     const pLightTop = new THREE.PointLight(0xffffff, 1, 10, 2);
     const pLightBottom = new THREE.PointLight(0xffffff, 1, 10, 2);
     // const pLightHelper = new THREE.PointLightHelper(pLight);
-    pLightTop.position.set(0, 0, 1.5);
-    pLightBottom.position.set(0, 0, -1.5);
+    pLightTop.position.set(0, 0, 3.5);
+    pLightBottom.position.set(0, 0, -3.5);
     // this.scene.add(pLightHelper);
     // this.scene.add(pLightTop);
     this.scene.add(pLightBottom);
@@ -76,7 +76,7 @@ export class Grapher {
     const lastCurve = this.curves.get(this.lastCurveKey) as Curve;
     const helper = new THREE.VertexNormalsHelper(lastCurve.mesh, .1, 0x00ff00, 1);
     this.scene.add(lastCurve.mesh);
-    // this.scene.add(helper);
+    this.scene.add(helper);
     this.lastCurveKey += 1;
     return this.lastCurveKey - 1;
   }

@@ -35,7 +35,7 @@ export abstract class Curve {
 
     this.equation = parseEquation(defaultEquation) as Equation;
   }
-  getParameters(): Map<String, Map<String, ParameterType<any>>> {
+  getParameters(): Map<string, Map<string, ParameterType<any>>> {
     return new Map([
       ['appearance', new Map([
         ['specular', new ColorParameter(

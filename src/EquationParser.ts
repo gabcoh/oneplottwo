@@ -44,11 +44,19 @@ const PAREN_OPERATOR: Operator = {
 };
 const functions: Map<string, Operator> = new Map([
   ['sum', {
-    name: 'EXP',
+    name: 'SUM',
     precedence: 4,
     arity: 2,
     func(...params: number[]) {
       return params.reduce((a, b) => a + b);
+    },
+  }],
+  ['sin', {
+    name: 'SIN',
+    precedence: 4,
+    arity: 1,
+    func(...params: number[]) {
+      return Math.sin(params[0]);
     },
   }],
 ]);

@@ -10,6 +10,9 @@ import linkstate from 'linkstate';
 
 import { Grapher } from '../Grapher';
 import { Curve } from '../curves/Curve';
+import { ColorParameter, NumberParameter, ParameterType } from '../ParameterTypes';
+
+import { NumberParameterController, ColorParameterController } from './ParameterControllers';
 
 export interface CurveControllerProps {
   curveKey: number;
@@ -31,12 +34,35 @@ extends Component<CurveControllerProps, CurveControllerState> {
       rawEquation: curve.equation.rawEquation,
     };
     this.updateCurveEquation = this.updateCurveEquation.bind(this);
+    this.createParameterElements = this.createParameterElements.bind(this);
+    this.createParameters = this.createParameters.bind(this);
   }
   updateCurveEquation(e: Event) {
     const maybeError = this.state.curve.updateEquation(this.state.rawEquation);
     if (maybeError !== null) {
-      console.log(maybeError as Error);
+      console.log(maybeError);
     }
+  }
+  createParameters(map: Map<string, ParameterType<any>>) {
+    const params = [];
+    for (const [key, value] of map.entries()) {
+      if (value instanceof NumberParameter) {
+        params.push(<li> <NumberParameterController param={ value } /> </li>);
+      } else if (value instanceof ColorParameter) {
+        params.push(<li> <ColorParameterController param={ value } /> </li>);
+      } else {
+        console.error(`key: ${ key } has value: ${ value } of unknown type`);
+      }
+    }
+    return params;
+  }
+  createParameterElements() {
+    const params = this.state.curve.getParameters();
+    const elements = [];
+    for (const [key, value] of params.entries()) {
+      elements.push(<li> { key } <ul> { this.createParameters(value) } </ul> </li>);
+    }
+    return elements;
   }
   render(props: CurveControllerProps, state: CurveControllerState) {
     return (
@@ -47,6 +73,9 @@ extends Component<CurveControllerProps, CurveControllerState> {
          onInput={ linkstate(this, 'rawEquation') }
          onBlur={ this.updateCurveEquation }
         />
+        <ul>
+          { this.createParameterElements() }
+        </ul>
       </span>
     );
   }
