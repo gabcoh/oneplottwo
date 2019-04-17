@@ -5,7 +5,7 @@
  *
  * This component represents all of the controls related to a curve.
  */
-import { h, render, Component } from 'preact';
+import * as React from 'react';
 import linkstate from 'linkstate';
 
 import { Grapher } from '../Grapher';
@@ -25,7 +25,7 @@ interface CurveControllerState {
 }
 
 export class CurveController
-extends Component<CurveControllerProps, CurveControllerState> {
+extends React.Component<CurveControllerProps, CurveControllerState> {
   constructor(props: CurveControllerProps) {
     super(props);
     const curve = this.props.grapher.getCurve(props.curveKey) as Curve;
@@ -37,7 +37,7 @@ extends Component<CurveControllerProps, CurveControllerState> {
     this.createParameterElements = this.createParameterElements.bind(this);
     this.createParameters = this.createParameters.bind(this);
   }
-  updateCurveEquation(e: Event) {
+  updateCurveEquation() {
     const maybeError = this.state.curve.updateEquation(this.state.rawEquation);
     if (maybeError !== null) {
       console.log(maybeError);
@@ -64,12 +64,12 @@ extends Component<CurveControllerProps, CurveControllerState> {
     }
     return elements;
   }
-  render(props: CurveControllerProps, state: CurveControllerState) {
+  render(): React.ReactElement {
     return (
       <span>
         <input
          type="text"
-         value={ state.rawEquation }
+         value={ this.state.rawEquation }
          onInput={ linkstate(this, 'rawEquation') }
          onBlur={ this.updateCurveEquation }
         />

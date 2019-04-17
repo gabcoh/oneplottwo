@@ -1,4 +1,5 @@
-import { h, render } from 'preact';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 
 import '../public/index.html';
 import { Grapher } from './Grapher';
@@ -18,7 +19,12 @@ function onResizeDone() {
 }
 window.addEventListener('resize', onResizeDone());
 
-render(<GraphController grapher={grapher} />, document.getElementById('ui') as HTMLElement);
+ReactDOM.render(
+  <GraphController
+    grapher={grapher}
+  />,
+  document.getElementById('ui') as HTMLElement,
+);
 
 // TODO this is a little hacky. maybe fix it
 class DragHandlerClass {

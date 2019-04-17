@@ -20,7 +20,7 @@ export abstract class ParameterType<T> {
 }
 
 export class ColorParameter extends ParameterType<number> {
-  // Just to differentiate from a normal string param incase that is necessery
+  // Just to differentiate from a normal number param incase that is necessery
   kind = 'color';
 }
 export class NumberParameter extends ParameterType<number> {

@@ -5,8 +5,8 @@
  *
  */
 
-import { h, render, Component } from 'preact';
-import linkstate from 'linkstate';
+import * as React from 'react';
+import { HuePicker } from 'react-color';
 
 import { Grapher } from '../Grapher';
 import { Curve } from '../curves/Curve';
@@ -20,14 +20,17 @@ interface ColorParameterControllerState {
 }
 
 export class ColorParameterController
-extends Component<ColorParameterControllerProps, ColorParameterControllerState> {
+extends React.Component<ColorParameterControllerProps, ColorParameterControllerState> {
   constructor(props: ColorParameterControllerProps) {
     super(props);
-    this.state = {
-    };
   }
-  render(props: ColorParameterControllerProps, state: ColorParameterControllerState) {
-    return <p> { props.param.getValue() } </p>;
+  render(): React.ReactNode {
+    const color = this.props.param.getValue();
+    return (
+      <HuePicker
+        color={{ r: color >> 16, g: (color >> 8) & 0xff, b: color & 0xff }}
+      />
+    );
   }
 }
 
@@ -39,14 +42,13 @@ interface NumberParameterControllerState {
 }
 
 export class NumberParameterController
-extends Component<NumberParameterControllerProps, NumberParameterControllerState> {
+extends React.Component<NumberParameterControllerProps, NumberParameterControllerState> {
   constructor(props: NumberParameterControllerProps) {
     super(props);
     this.state = {
     };
   }
-  render(props: NumberParameterControllerProps, state: NumberParameterControllerState) {
-
-    return <p> { props.param.getValue() } </p>;
+  render(): React.ReactNode {
+    return <p> { this.props.param.getValue() } </p>;
   }
 }

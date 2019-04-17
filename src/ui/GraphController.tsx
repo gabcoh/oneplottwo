@@ -4,10 +4,8 @@
  *
  * This component handles displaying a list of every curve.
  */
-import { h, render, Component } from 'preact';
+import * as React from 'react';
 import { OrderedSet } from 'immutable';
-
-import 'preact/debug';
 
 import { Grapher } from '../Grapher';
 
@@ -21,14 +19,14 @@ interface GraphControllerState {
   curveKeys: OrderedSet<number>;
 }
 
-export class GraphController extends Component<GraphControllerProps, GraphControllerState> {
+export class GraphController extends React.Component<GraphControllerProps, GraphControllerState> {
   constructor(props: GraphControllerProps) {
     super(props);
     this.state = {
       curveKeys: OrderedSet<number>(),
     };
   }
-  addRectangularCurve = (e: Event) => {
+  addRectangularCurve = () => {
     const maybeNextKey = this.props.grapher.addRectangularCurve();
     if (maybeNextKey != null) {
       this.setState({
@@ -39,7 +37,7 @@ export class GraphController extends Component<GraphControllerProps, GraphContro
       console.error('EQUATION LIMIT REACHED');
     }
   }
-  removeCurve = (key: number) => (e: Event) => {
+  removeCurve = (key: number) => () => {
     this.props.grapher.removeCurve(key);
     this.setState({ curveKeys: this.state.curveKeys.delete(key) });
   }
@@ -51,11 +49,11 @@ export class GraphController extends Component<GraphControllerProps, GraphContro
       </div>
     );
   }
-  render(props: GraphControllerProps, state: GraphControllerState) {
+  render(): React.ReactNode {
     return (
       <span>
         <ul>
-          { [...state.curveKeys].map(this.renderCurve) }
+          { [...this.state.curveKeys].map(this.renderCurve) }
         </ul>
         <button
           onClick={this.addRectangularCurve}
