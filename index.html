@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <style> 
+body {
+  margin: 0px;
+}
+#graph, #ui, #bar {
+  float: left;
+}
+#graph, #graph canvas{
+  width: 70%;
+  height: 100%;
+}
+#ui {
+  width: 29%;
+  height: 100%;
+}
+#bar {
+  width: 1%;
+  height: 100%;
+  background-color: grey;
+  z-index: 1;
+}
+    </style> 
+  </head>
+  <body>
+    <div id="graph"> </div>
+    <div id="bar" draggable> </div>
+    </div>
+    <div id="ui"> </div>
+      <script src="bundle.js"></script>
+  </body>
+</html>
