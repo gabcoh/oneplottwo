@@ -23,6 +23,7 @@ export abstract class Curve {
   equation: Equation;
 
   specular = 0xffffff;
+  color: number;
   shininess = 30;
 
   abstract geometry: THREE.BufferGeometry;
@@ -32,29 +33,32 @@ export abstract class Curve {
   constructor(defaultEquation: string) {
     // Set to a reasonable default
     this.points = 10;
+    this.color = Math.floor(Math.random()*0xffffff);
 
     this.equation = parseEquation(defaultEquation) as Equation;
   }
   getParameters(): Map<string, Map<string, ParameterType<any>>> {
     return new Map([
       ['appearance', new Map([
-        ['specular', new ColorParameter(
-          () => { return this.specular; },
-          (color: number) => { this.specular = color; this.reMesh.bind(this); })],
+        ['color', new ColorParameter(
+          () => { return this.color; },
+          (color: number) => { this.color = color; this.updateBuffers(); })],
         ['shininess', new NumberParameter(
           () => { return this.shininess; },
-          (color: number) => { this.shininess = color; this.reMesh.bind(this); }, 0, 100)],
+          (color: number) => { this.shininess = color; this.reMesh(); }, 0, 100)],
       ])],
     ]);
   }
   reMesh() {
+    console.log('hi');
+    console.log(this.color);
     if (this.material !== undefined && this.mesh !== undefined) {
       this.dispose();
     }
     this.material = new THREE.MeshPhongMaterial({
       side: THREE.DoubleSide,
       specular: this.specular,
-      shininess: 30,
+      shininess: this.shininess,
       wireframe: false,
       vertexColors: THREE.VertexColors,
     });
@@ -70,6 +74,7 @@ export abstract class Curve {
     this.geometry.setIndex(new THREE.BufferAttribute(indicies, 1));
   }
 
+  // TODO Seperate these out. they don't need to be bound together
   abstract generatePointsColorsAndNormals(): [Float32Array, Float32Array, Float32Array];
 
   generateIndicies(): Uint32Array {

@@ -29,6 +29,7 @@ extends React.Component<ColorParameterControllerProps, ColorParameterControllerS
     return (
       <HuePicker
         color={{ r: color >> 16, g: (color >> 8) & 0xff, b: color & 0xff }}
+        onChangeComplete={ (color) => { this.props.param.updateValue((color.rgb.r << 16) + (color.rgb.g << 8) + color.rgb.b); } }
       />
     );
   }

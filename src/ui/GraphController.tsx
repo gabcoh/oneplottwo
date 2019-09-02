@@ -43,7 +43,7 @@ export class GraphController extends React.Component<GraphControllerProps, Graph
   }
   renderCurve = (key: number) => {
     return (
-      <div>
+      <div key={key}>
       <CurveController grapher={this.props.grapher} curveKey={key}/>
       <button onClick={ this.removeCurve(key) }> X </button>
       </div>

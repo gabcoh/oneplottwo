@@ -47,9 +47,9 @@ extends React.Component<CurveControllerProps, CurveControllerState> {
     const params = [];
     for (const [key, value] of map.entries()) {
       if (value instanceof NumberParameter) {
-        params.push(<li> <NumberParameterController param={ value } /> </li>);
+        params.push(<li key={key}> <NumberParameterController param={ value } /> </li>);
       } else if (value instanceof ColorParameter) {
-        params.push(<li> <ColorParameterController param={ value } /> </li>);
+        params.push(<li key={key}> <ColorParameterController param={ value } /> </li>);
       } else {
         console.error(`key: ${ key } has value: ${ value } of unknown type`);
       }
@@ -60,7 +60,7 @@ extends React.Component<CurveControllerProps, CurveControllerState> {
     const params = this.state.curve.getParameters();
     const elements = [];
     for (const [key, value] of params.entries()) {
-      elements.push(<li> { key } <ul> { this.createParameters(value) } </ul> </li>);
+      elements.push(<li key={key}> { key } <ul> { this.createParameters(value) } </ul> </li>);
     }
     return elements;
   }
@@ -70,7 +70,7 @@ extends React.Component<CurveControllerProps, CurveControllerState> {
         <input
          type="text"
          value={ this.state.rawEquation }
-         onInput={ linkstate(this, 'rawEquation') }
+         onChange={ linkstate(this, 'rawEquation') }
          onBlur={ this.updateCurveEquation }
         />
         <ul>

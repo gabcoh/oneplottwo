@@ -79,11 +79,14 @@ export class RectangularCurve extends Curve {
         normals[base + 1] = vx.y;
         normals[base + 2] = vx.z;
 
-        colors[base + 0] = 200;
-        colors[base + 1] = 0;
-        colors[base + 2] = 0;
+        colors[base + 0] = (this.color >> 16)/255;
+        colors[base + 1] = ((this.color >> 8) & 0xff)/255;
+        colors[base + 2] = (this.color & 0xff)/255;
       }
     }
+    console.log(colors[0]);
+    console.log(colors[1]);
+    console.log(colors[2]);
     return [vertices, colors, normals];
   }
   updateEquation(rawEquation: string) : (Error | null) {
