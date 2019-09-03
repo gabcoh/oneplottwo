@@ -6,7 +6,7 @@
  */
 
 import * as React from 'react';
-import { HuePicker } from 'react-color';
+import { HuePicker, ColorResult } from 'react-color';
 
 import { Grapher } from '../Grapher';
 import { Curve } from '../curves/Curve';
@@ -23,15 +23,19 @@ export class ColorParameterController
 extends React.Component<ColorParameterControllerProps, ColorParameterControllerState> {
   constructor(props: ColorParameterControllerProps) {
     super(props);
+    this.onColorChanged = this.onColorChanged.bind(this);
   }
   render(): React.ReactNode {
     const color = this.props.param.getValue();
     return (
       <HuePicker
         color={{ r: color >> 16, g: (color >> 8) & 0xff, b: color & 0xff }}
-        onChangeComplete={ (color) => { this.props.param.updateValue((color.rgb.r << 16) + (color.rgb.g << 8) + color.rgb.b); } }
+        onChangeComplete={ this.onColorChanged }
       />
     );
+  }
+  onColorChanged(color: ColorResult) {
+    this.props.param.updateValue((color.rgb.r << 16) + (color.rgb.g << 8) + color.rgb.b);
   }
 }
 

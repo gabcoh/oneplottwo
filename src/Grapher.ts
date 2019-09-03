@@ -50,21 +50,24 @@ export class Grapher {
 
     const pLightTop = new THREE.PointLight(0xffffff, 1, 10, 2);
     const pLightBottom = new THREE.PointLight(0xffffff, 1, 10, 2);
-    //const pLightHelper = new THREE.PointLightHelper(pLight);
+    // const pLightHelper = new THREE.PointLightHelper(pLight);
     pLightTop.position.set(0, 0, 3.5);
     pLightBottom.position.set(0, 0, -3.5);
-    //this.scene.add(pLightHelper);
+    // this.scene.add(pLightHelper);
     this.scene.add(pLightTop);
     this.scene.add(pLightBottom);
     const directionalLightTop = new THREE.DirectionalLight(0x404040, 0.5);
     directionalLightTop.translateOnAxis(new THREE.Vector3(0, 0, 1).normalize(), 2);
     const helper = new THREE.DirectionalLightHelper(directionalLightTop, 1);
     this.scene.add(directionalLightTop);
-    //this.scene.add(helper);
+    // this.scene.add(helper);
     const axesHelper = new THREE.AxesHelper();
     this.scene.add(axesHelper);
 
-    this.renderer = new THREE.WebGLRenderer();
+    // Set background color
+    this.scene.background = new THREE.Color(0xdddddd);
+
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(elem.clientWidth, elem.clientHeight);
     elem.appendChild(this.renderer.domElement);
   }
@@ -74,9 +77,9 @@ export class Grapher {
   addCurve(curve: Curve) : (number | null) {
     this.curves.set(this.lastCurveKey, curve);
     const lastCurve = this.curves.get(this.lastCurveKey) as Curve;
-    //const helper = new THREE.VertexNormalsHelper(lastCurve.mesh, .1, 0x00ff00, 1);
+    // const helper = new THREE.VertexNormalsHelper(lastCurve.mesh, .1, 0x00ff00, 1);
     this.scene.add(lastCurve.mesh);
-    //this.scene.add(helper);
+    // this.scene.add(helper);
     this.lastCurveKey += 1;
     return this.lastCurveKey - 1;
   }

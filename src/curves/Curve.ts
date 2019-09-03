@@ -24,7 +24,7 @@ export abstract class Curve {
 
   specular = 0xffffff;
   color: number;
-  shininess = 30;
+  shininess = 10;
 
   abstract geometry: THREE.BufferGeometry;
   abstract material: THREE.Material;
@@ -33,7 +33,7 @@ export abstract class Curve {
   constructor(defaultEquation: string) {
     // Set to a reasonable default
     this.points = 10;
-    this.color = Math.floor(Math.random()*0xffffff);
+    this.color = Math.floor(Math.random() * 0xffffff);
 
     this.equation = parseEquation(defaultEquation) as Equation;
   }
@@ -50,8 +50,6 @@ export abstract class Curve {
     ]);
   }
   reMesh() {
-    console.log('hi');
-    console.log(this.color);
     if (this.material !== undefined && this.mesh !== undefined) {
       this.dispose();
     }
@@ -67,9 +65,30 @@ export abstract class Curve {
   // only need to update indicies when number of points changes
   updateBuffers() {
     const [vertices, colors, normals] = this.generatePointsColorsAndNormals();
-    this.geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-    this.geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
-    this.geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    if ('position' in this.geometry.attributes) {
+      const attribute = this.geometry.attributes['position'] as THREE.BufferAttribute;
+      attribute.setArray(vertices);
+      attribute.needsUpdate = true;
+    } else {
+      this.geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+    }
+
+    if ('normal' in this.geometry.attributes) {
+      const attribute = this.geometry.attributes['normal'] as THREE.BufferAttribute;
+      attribute.setArray(normals);
+      attribute.needsUpdate = true;
+    } else {
+      this.geometry.addAttribute('normal', new THREE.BufferAttribute(normals, 3));
+    }
+
+    if ('color' in this.geometry.attributes) {
+      const attribute = this.geometry.attributes['color'] as THREE.BufferAttribute;
+      attribute.setArray(colors);
+      attribute.needsUpdate = true;
+    } else {
+      this.geometry.addAttribute('color', new THREE.BufferAttribute(colors, 3));
+    }
     const indicies = this.generateIndicies();
     this.geometry.setIndex(new THREE.BufferAttribute(indicies, 1));
   }
