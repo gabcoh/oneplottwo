@@ -101,7 +101,7 @@ export class GraphController extends React.Component<GraphControllerProps, Graph
             onChange={linkstate(this, 'minX')}
             onBlur={this.updateBounds}
           /> 
-          &lt; x &gt;
+          &lt; x &lt;
           <input 
             type="number" 
             value={ this.state.maxX }
@@ -116,7 +116,7 @@ export class GraphController extends React.Component<GraphControllerProps, Graph
             onChange={linkstate(this, 'minY')}
             onBlur={this.updateBounds}
           /> 
-          &lt; x &gt;
+          &lt; y &lt;
           <input 
             type="number" 
             value={ this.state.maxY }
@@ -131,7 +131,7 @@ export class GraphController extends React.Component<GraphControllerProps, Graph
             onChange={linkstate(this, 'minZ')}
             onBlur={this.updateBounds}
           /> 
-          &lt; x &gt;
+          &lt; z &lt;
           <input 
             type="number" 
             value={ this.state.maxZ }
