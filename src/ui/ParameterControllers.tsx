@@ -7,6 +7,7 @@
 
 import * as React from 'react';
 import { HuePicker, ColorResult } from 'react-color';
+import linkstate from 'linkstate';
 
 import { Grapher } from '../Grapher';
 import { Curve } from '../curves/Curve';
@@ -44,6 +45,7 @@ export interface NumberParameterControllerProps {
 }
 
 interface NumberParameterControllerState {
+  value: string;
 }
 
 export class NumberParameterController
@@ -51,9 +53,21 @@ extends React.Component<NumberParameterControllerProps, NumberParameterControlle
   constructor(props: NumberParameterControllerProps) {
     super(props);
     this.state = {
+      value: props.param.getValue().toString(),
     };
   }
+  maybeSetValue() {
+    if (isNaN(Number.parseFloat(this.state.value))) {
+      return;
+    }
+    this.props.param.updateValue(Number.parseFloat(this.state.value));
+  }
   render(): React.ReactNode {
-    return <p> { this.props.param.getValue() } </p>;
+    return <input
+    type="number" 
+    value={this.state.value} 
+    onChange={linkstate(this, "value")}
+    onBlur={this.maybeSetValue.bind(this)}
+    />;
   }
 }

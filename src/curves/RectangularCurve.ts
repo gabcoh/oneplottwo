@@ -22,20 +22,16 @@ import { ParameterType, ColorParameter, NumberParameter } from '../ParameterType
 import { Curve } from './Curve';
 
 export class RectangularCurve extends Curve {
-  bounds: RectangularBounds = {
-    minX: -1,
-    maxX: 1,
-    minY: -1,
-    maxY: 1,
-    minZ: -1,
-    maxZ: 1,
-  };
+
   geometry: THREE.BufferGeometry;
   material: THREE.Material;
   mesh: THREE.Object3D;
 
-  constructor() {
-    super('z=x*y');
+  constructor(bounds: RectangularBounds) {
+    super('z=x*y', bounds);
+    
+    this.bounds = bounds;
+
     this.geometry = new THREE.BufferGeometry();
     // calling elsewhere
     this.updateBuffers();
@@ -67,8 +63,8 @@ export class RectangularCurve extends Curve {
         const x = (j / (this.points - 1)) * xRange + this.bounds.minX;
         const y = (i / (this.points - 1)) * yRange + this.bounds.minY;
 
-        vertices[base + 0] = x;
-        vertices[base + 1] = y;
+        vertices[base + 0] = ((x - this.bounds.minX) / xRange) * 2 - 1;
+        vertices[base + 1] = ((y - this.bounds.minY) / yRange) * 2 - 1;
         vertices[base + 2] = this.equation.evaluate(x, y);
 
         const [dx, dy] = this.equation.derivate(x, y, xRange / 1000);

@@ -26,16 +26,26 @@ export abstract class Curve {
   color: number;
   shininess = 10;
 
+  bounds: RectangularBounds;
+
   abstract geometry: THREE.BufferGeometry;
   abstract material: THREE.Material;
   abstract mesh: THREE.Object3D;
 
-  constructor(defaultEquation: string) {
+  constructor(defaultEquation: string, bounds: RectangularBounds) {
     // Set to a reasonable default
+    this.bounds = bounds;
+
     this.points = 10;
     this.color = Math.floor(Math.random() * 0xffffff);
 
     this.equation = parseEquation(defaultEquation) as Equation;
+  }
+  setPoints(points: number) {
+    this.points = points;
+  }
+  setBounds(bounds: RectangularBounds) {
+    this.bounds = bounds;
   }
   getParameters(): Map<string, Map<string, ParameterType<any>>> {
     return new Map([
@@ -46,6 +56,11 @@ export abstract class Curve {
         ['shininess', new NumberParameter(
           () => { return this.shininess; },
           (color: number) => { this.shininess = color; this.reMesh(); }, 0, 100)],
+      ])],
+      ['rendering', new Map([
+        ['points', new NumberParameter(
+          () => { return this.points; },
+          (points: number) => { this.points = points; this.updateBuffers(); }, 0, 100)],
       ])],
     ]);
   }

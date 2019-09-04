@@ -20,6 +20,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three-orbitcontrols-ts';
 
+import { RectangularBounds } from './Bounds';
 import { Curve } from './curves/Curve';
 import { RectangularCurve } from './curves/RectangularCurve';
 
@@ -31,6 +32,15 @@ export class Grapher {
 
   lastCurveKey: number = 0;
   curves: Map<number, Curve> = new Map<number, Curve>();
+
+  bounds: RectangularBounds = {
+    minX: -1,
+    maxX: 1,
+    minY: -1,
+    maxY: 1,
+    minZ: -1,
+    maxZ: 1,
+  };
 
   domElement: HTMLElement;
 
@@ -61,6 +71,8 @@ export class Grapher {
     const helper = new THREE.DirectionalLightHelper(directionalLightTop, 1);
     this.scene.add(directionalLightTop);
     // this.scene.add(helper);
+    let hemiLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+    this.scene.add(hemiLight);
     const axesHelper = new THREE.AxesHelper();
     this.scene.add(axesHelper);
 
@@ -70,9 +82,11 @@ export class Grapher {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(elem.clientWidth, elem.clientHeight);
     elem.appendChild(this.renderer.domElement);
+
+    this.addRectangularCurve = this.addRectangularCurve.bind(this);
   }
   addRectangularCurve(): (number | null) {
-    return this.addCurve(new RectangularCurve());
+    return this.addCurve(new RectangularCurve(this.bounds));
   }
   addCurve(curve: Curve) : (number | null) {
     this.curves.set(this.lastCurveKey, curve);
@@ -94,6 +108,15 @@ export class Grapher {
   }
   getCurve(key: number) : (Curve | undefined) {
     return this.curves.get(key);
+  }
+  updateCurveBounds(curve: Curve) {
+    curve.setBounds(this.bounds);
+    curve.updateBuffers();
+  }
+  updateBounds(bounds: RectangularBounds) {
+    console.log(bounds);
+    this.bounds = bounds;
+    this.curves.forEach(this.updateCurveBounds.bind(this));
   }
   animate() {
     requestAnimationFrame(this.animate.bind(this));
