@@ -47,9 +47,9 @@ extends React.Component<CurveControllerProps, CurveControllerState> {
     const params = [];
     for (const [key, value] of map.entries()) {
       if (value instanceof NumberParameter) {
-        params.push(<li key={key}> <NumberParameterController param={ value } /> </li>);
+        params.push(<li key={key}> {key}: <NumberParameterController param={ value } /> </li>);
       } else if (value instanceof ColorParameter) {
-        params.push(<li key={key}> <ColorParameterController param={ value } /> </li>);
+        params.push(<li key={key}> {key}: <ColorParameterController param={ value } /> </li>);
       } else {
         console.error(`key: ${ key } has value: ${ value } of unknown type`);
       }
