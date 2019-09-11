@@ -60,26 +60,26 @@ export class RectangularCurve extends Curve {
     let  bRange = this.bounds.maxY - this.bounds.minY;
     let  minA = this.bounds.minX;
     let  minB = this.bounds.minY;
-    let  independentInd = 2;
-    let  aInd = 0;
-    let  bInd = 1;
+    let  dependentInd = 2;
+    let  aDep = 0;
+    let  bDep = 1;
     console.log(this.equation.independentVariable === 'x');
     if (this.equation.independentVariable === 'x') {
       aRange = this.bounds.maxY - this.bounds.minY;
       bRange = this.bounds.maxZ - this.bounds.minZ;
       minA = this.bounds.minY;
       minB = this.bounds.minZ;
-      independentInd = 0;
-      aInd = 1;
-      bInd = 2;
+      dependentInd = 0;
+      aDep = 1;
+      bDep = 2;
     } else if (this.equation.independentVariable === 'Y') {
       aRange = this.bounds.maxX - this.bounds.minX;
       bRange = this.bounds.maxZ - this.bounds.minZ;
       minA = this.bounds.minX;
       minB = this.bounds.minZ;
-      independentInd = 1;
-      aInd = 0;
-      bInd = 2;
+      dependentInd = 1;
+      aDep = 0;
+      bDep = 2;
     }
     for (let i = 0; i < this.points; i += 1) {
       for (let j = 0; j < this.points; j += 1) {
@@ -87,17 +87,17 @@ export class RectangularCurve extends Curve {
         const a = (j / (this.points - 1)) * aRange + minA;
         const b = (i / (this.points - 1)) * bRange + minB;
 
-        vertices[base + aInd] = ((a - minA) / aRange) * 2 - 1;
-        vertices[base + bInd] = ((b - minB) / bRange) * 2 - 1;
-        vertices[base + independentInd] = this.equation.evaluate(a, b);
+        vertices[base + aDep] = a;
+        vertices[base + bDep] = b;
+        vertices[base + dependentInd] = this.equation.evaluate(a, b);
 
         const [da, db] = this.equation.derivate(a, b, aRange / 1000);
         const va = new THREE.Vector3(1, 0, da);
         const vb = new THREE.Vector3(0, 1, db);
         va.cross(vb);
-        normals[base + aInd] = va.x;
-        normals[base + bInd] = va.y;
-        normals[base + independentInd] = va.z;
+        normals[base + aDep] = va.x;
+        normals[base + bDep] = va.y;
+        normals[base + dependentInd] = va.z;
 
         colors[base + 0] = (this.color >> 16) / 255;
         colors[base + 1] = ((this.color >> 8) & 0xff) / 255;
