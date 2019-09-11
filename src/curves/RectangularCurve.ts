@@ -29,7 +29,7 @@ export class RectangularCurve extends Curve {
 
   constructor(bounds: RectangularBounds) {
     super('z=x*y', bounds);
-    
+
     this.bounds = bounds;
 
     this.geometry = new THREE.BufferGeometry();
@@ -55,25 +55,49 @@ export class RectangularCurve extends Curve {
     const vertices = new Float32Array(this.points * this.points * 3);
     const normals = new Float32Array(this.points * this.points * 3);
     const colors = new Float32Array(this.points * this.points * 3);
-    const xRange = this.bounds.maxX - this.bounds.minX;
-    const yRange = this.bounds.maxY - this.bounds.minY;
+
+    let  aRange = this.bounds.maxX - this.bounds.minX;
+    let  bRange = this.bounds.maxY - this.bounds.minY;
+    let  minA = this.bounds.minX;
+    let  minB = this.bounds.minY;
+    let  independentInd = 2;
+    let  aInd = 0;
+    let  bInd = 1;
+    console.log(this.equation.independentVariable === 'x');
+    if (this.equation.independentVariable === 'x') {
+      aRange = this.bounds.maxY - this.bounds.minY;
+      bRange = this.bounds.maxZ - this.bounds.minZ;
+      minA = this.bounds.minY;
+      minB = this.bounds.minZ;
+      independentInd = 0;
+      aInd = 1;
+      bInd = 2;
+    } else if (this.equation.independentVariable === 'Y') {
+      aRange = this.bounds.maxX - this.bounds.minX;
+      bRange = this.bounds.maxZ - this.bounds.minZ;
+      minA = this.bounds.minX;
+      minB = this.bounds.minZ;
+      independentInd = 1;
+      aInd = 0;
+      bInd = 2;
+    }
     for (let i = 0; i < this.points; i += 1) {
       for (let j = 0; j < this.points; j += 1) {
         const base = i * this.points * 3 + j * 3;
-        const x = (j / (this.points - 1)) * xRange + this.bounds.minX;
-        const y = (i / (this.points - 1)) * yRange + this.bounds.minY;
+        const a = (j / (this.points - 1)) * aRange + minA;
+        const b = (i / (this.points - 1)) * bRange + minB;
 
-        vertices[base + 0] = ((x - this.bounds.minX) / xRange) * 2 - 1;
-        vertices[base + 1] = ((y - this.bounds.minY) / yRange) * 2 - 1;
-        vertices[base + 2] = this.equation.evaluate(x, y);
+        vertices[base + aInd] = ((a - minA) / aRange) * 2 - 1;
+        vertices[base + bInd] = ((b - minB) / bRange) * 2 - 1;
+        vertices[base + independentInd] = this.equation.evaluate(a, b);
 
-        const [dx, dy] = this.equation.derivate(x, y, xRange / 1000);
-        const vx = new THREE.Vector3(1, 0, dx);
-        const vy = new THREE.Vector3(0, 1, dy);
-        vx.cross(vy);
-        normals[base + 0] = vx.x;
-        normals[base + 1] = vx.y;
-        normals[base + 2] = vx.z;
+        const [da, db] = this.equation.derivate(a, b, aRange / 1000);
+        const va = new THREE.Vector3(1, 0, da);
+        const vb = new THREE.Vector3(0, 1, db);
+        va.cross(vb);
+        normals[base + aInd] = va.x;
+        normals[base + bInd] = va.y;
+        normals[base + independentInd] = va.z;
 
         colors[base + 0] = (this.color >> 16) / 255;
         colors[base + 1] = ((this.color >> 8) & 0xff) / 255;

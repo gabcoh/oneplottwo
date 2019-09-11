@@ -71,7 +71,7 @@ export class Grapher {
     const helper = new THREE.DirectionalLightHelper(directionalLightTop, 1);
     this.scene.add(directionalLightTop);
     // this.scene.add(helper);
-    let hemiLight = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+    const  hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
     this.scene.add(hemiLight);
     const axesHelper = new THREE.AxesHelper();
     this.scene.add(axesHelper);

@@ -55,6 +55,7 @@ extends React.Component<NumberParameterControllerProps, NumberParameterControlle
     this.state = {
       value: props.param.getValue().toString(),
     };
+    this.maybeSetValue  = this.maybeSetValue.bind(this);
   }
   maybeSetValue() {
     if (isNaN(Number.parseFloat(this.state.value))) {
@@ -63,11 +64,13 @@ extends React.Component<NumberParameterControllerProps, NumberParameterControlle
     this.props.param.updateValue(Number.parseFloat(this.state.value));
   }
   render(): React.ReactNode {
-    return <input
-    type="number" 
-    value={this.state.value} 
-    onChange={linkstate(this, "value")}
-    onBlur={this.maybeSetValue.bind(this)}
-    />;
+    return (
+      <input
+        type="number"
+        value={this.state.value}
+        onChange={linkstate(this, 'value')}
+        onBlur={this.maybeSetValue}
+      />
+    );
   }
 }

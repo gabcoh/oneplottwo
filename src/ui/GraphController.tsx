@@ -38,7 +38,7 @@ export class GraphController extends React.Component<GraphControllerProps, Graph
       maxX: props.grapher.bounds.maxX.toString(),
       maxY: props.grapher.bounds.maxY.toString(),
       maxZ: props.grapher.bounds.maxZ.toString(),
-    }
+    };
 
     this.updateBounds = this.updateBounds.bind(this);
   }
@@ -68,13 +68,13 @@ export class GraphController extends React.Component<GraphControllerProps, Graph
   updateBounds() {
     const maybeBounds = this.getBounds();
     if (maybeBounds === null) {
-      console.log("A dimension is not a number");
+      console.log('A dimension is not a number');
       return;
     }
-    this.props.grapher.updateBounds(this.getBounds() as RectangularBounds) 
+    this.props.grapher.updateBounds(this.getBounds() as RectangularBounds);
   }
   getBounds(): (RectangularBounds | null) {
-    let maybeBounds: RectangularBounds = {
+    const maybeBounds: RectangularBounds = {
       minX: Number.parseFloat(this.state.minX),
       maxX: Number.parseFloat(this.state.maxX),
       minY: Number.parseFloat(this.state.minY),
@@ -82,7 +82,7 @@ export class GraphController extends React.Component<GraphControllerProps, Graph
       minZ: Number.parseFloat(this.state.minZ),
       maxZ: Number.parseFloat(this.state.maxZ),
     };
-    for (let [key, values] of Object.entries(maybeBounds)) {
+    for (const [key, values] of Object.entries(maybeBounds)) {
       if (isNaN(values)) {
         return null;
       }
@@ -90,50 +90,50 @@ export class GraphController extends React.Component<GraphControllerProps, Graph
     return maybeBounds;
   }
   renderDimensions() {
-    return ( 
-      <div className={"dimensions"}>
+    return (
+      <div className={'dimensions'}>
       <h5> Dimensions </h5>
       <ul>
-        <li> 
-          <input 
-            type="number" 
+        <li>
+          <input
+            type="number"
             value={ this.state.minX }
             onChange={linkstate(this, 'minX')}
             onBlur={this.updateBounds}
-          /> 
+          />
           &lt; x &lt;
-          <input 
-            type="number" 
+          <input
+            type="number"
             value={ this.state.maxX }
             onChange={linkstate(this, 'maxX')}
             onBlur={this.updateBounds}
           />
         </li>
-        <li> 
-          <input 
-            type="number" 
+        <li>
+          <input
+            type="number"
             value={ this.state.minY }
             onChange={linkstate(this, 'minY')}
             onBlur={this.updateBounds}
-          /> 
+          />
           &lt; y &lt;
-          <input 
-            type="number" 
+          <input
+            type="number"
             value={ this.state.maxY }
             onChange={linkstate(this, 'maxY')}
             onBlur={this.updateBounds}
           />
         </li>
-        <li> 
-          <input 
-            type="number" 
+        <li>
+          <input
+            type="number"
             value={ this.state.minZ }
             onChange={linkstate(this, 'minZ')}
             onBlur={this.updateBounds}
-          /> 
+          />
           &lt; z &lt;
-          <input 
-            type="number" 
+          <input
+            type="number"
             value={ this.state.maxZ }
             onChange={linkstate(this, 'maxZ')}
             onBlur={this.updateBounds}

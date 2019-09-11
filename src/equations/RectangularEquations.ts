@@ -28,14 +28,25 @@ export class ExplicitRectangularEquation {
     }
     return evaluateAST(this.ast, vars);
   }
-  derivate(x: number, y: number, delta: number): [number, number] {
-    const vars = new Map<string, number>([['x', x], ['y', y]]);
-    const fxy = evaluateAST(this.ast, vars);
-    vars.set('x', x + delta);
-    const dfx = evaluateAST(this.ast, vars) - fxy;
-    vars.set('x', x);
-    vars.set('y', y + delta);
-    const dfy = evaluateAST(this.ast, vars) - fxy;
-    return [dfx / delta, dfy / delta];
+  derivate(valA: number, valB: number, delta: number): [number, number] {
+    let vars = new Map<string, number>([['y', valA], ['z', valB]]);
+    let varA = 'y';
+    let varB = 'z';
+    if (this.independentVariable === 'z') {
+      vars = new Map<string, number>([['x', valA], ['y', valB]]);
+      varA = 'x';
+      varB = 'y';
+    } else if (this.independentVariable === 'y') {
+      vars = new Map<string, number>([['x', valA], ['z', valB]]);
+      varA = 'x';
+      varB = 'z';
+    }
+    const fab = evaluateAST(this.ast, vars);
+    vars.set(varA, valA + delta);
+    const dfa = evaluateAST(this.ast, vars) - fab;
+    vars.set(varA, valA);
+    vars.set(varB, valB + delta);
+    const dfb = evaluateAST(this.ast, vars) - fab;
+    return [dfa / delta, dfb / delta];
   }
 }
