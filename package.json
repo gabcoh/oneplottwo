@@ -43,7 +43,7 @@
 		"react": "^16.8.6",
 		"react-color": "^2.17.0",
 		"react-dom": "^16.8.6",
-		"three": "^0.102.1",
+		"three": "^0.137.0",
 		"three-orbitcontrols-ts": "git+https://git@github.com/nicolaspanel/three-orbitcontrols-ts.git"
 	}
 }
